@@ -669,6 +669,8 @@ class PlayState extends MusicBeatState
 	@:noCompletion @:dox(hide) private var _startCountdownCalled:Bool = false;
 	@:noCompletion @:dox(hide) private var _endSongCalled:Bool = false;
 
+	@:noCompletion @:dox(hide) private static var _ONE_ARG:Array<Dynamic> = [null];
+
 	@:dox(hide)
 	var __vocalSyncTimer:Float = 1;
 
@@ -1515,7 +1517,7 @@ class PlayState extends MusicBeatState
 		paused = true;
 
 		// 1 / 1000 chance for Gitaroo Man easter egg
-		if (allowGitaroo && FlxG.random.bool(Flags.GITAROO_CHANCE))
+		if (!chartingMode && allowGitaroo && FlxG.random.bool(Flags.GITAROO_CHANCE))
 		{
 			// gitaroo man easter egg
 			FlxG.switchState(new GitarooPause());
@@ -1636,12 +1638,13 @@ class PlayState extends MusicBeatState
 	@:dox(hide)
 	override public function update(elapsed:Float)
 	{
-		scripts.call("update", [elapsed]);
+		_ONE_ARG[0] = elapsed;
+		scripts.call("update", _ONE_ARG);
 
 		if (inCutscene)
 		{
 			super.update(elapsed);
-			scripts.call("postUpdate", [elapsed]);
+			scripts.call("postUpdate", _ONE_ARG);
 			return;
 		}
 
@@ -1742,7 +1745,7 @@ class PlayState extends MusicBeatState
 
 		super.update(elapsed);
 
-		scripts.call("postUpdate", [elapsed]);
+		scripts.call("postUpdate", _ONE_ARG);
 	}
 
 	override function draw()
