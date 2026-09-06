@@ -1077,10 +1077,18 @@ class PlayState extends MusicBeatState
 			if (s != null)
 				FlxG.sound.load(Paths.sound(s));
 
+<<<<<<< HEAD
 		if (chartingMode)
 		{
 			WindowUtils.prefix = Charter.undos.unsaved ? Flags.UNDO_PREFIX : "";
 			WindowUtils.suffix = TU.translate("playtesting.chartPlaytesting");
+=======
+		if (chartingMode) {
+			if (Flags.CHANGE_WINDOW_TITLE_PLAYSTATE) {
+				WindowUtils.prefix = Charter.undos.unsaved ? Flags.UNDO_PREFIX : "";
+				WindowUtils.suffix = TU.translate("playtesting.chartPlaytesting");
+			}
+>>>>>>> imgui
 
 			SaveWarning.showWarning = Charter.undos.unsaved;
 			SaveWarning.selectionClass = CharterSelection;
@@ -1282,8 +1290,12 @@ class PlayState extends MusicBeatState
 			PlayState.instance.gameAndCharsCall("onStageDestroy", [stage]);
 		scripts.call("destroy");
 
+<<<<<<< HEAD
 		for (g in __cachedGraphics)
 			g.useCount--;
+=======
+		for (g in __cachedGraphics) g.decrementUseCount();
+>>>>>>> imgui
 		@:privateAccess {
 			for (strumLine in strumLines.members)
 				FlxG.sound.destroySound(strumLine.vocals);
@@ -1304,7 +1316,7 @@ class PlayState extends MusicBeatState
 
 		super.destroy();
 
-		WindowUtils.resetAffixes();
+		if (Flags.CHANGE_WINDOW_TITLE_PLAYSTATE) WindowUtils.resetAffixes();
 		SaveWarning.reset();
 
 		instance = null;
@@ -1462,6 +1474,7 @@ class PlayState extends MusicBeatState
 	@:dox(hide)
 	override public function onFocus():Void
 	{
+<<<<<<< HEAD
 		if (!paused && FlxG.autoPause)
 		{
 			for (strumLine in strumLines.members)
@@ -1469,6 +1482,8 @@ class PlayState extends MusicBeatState
 			inst.resume();
 			vocals.resume();
 		}
+=======
+>>>>>>> imgui
 		gameAndCharsCall("onFocus");
 		updateDiscordPresence();
 		super.onFocus();
@@ -1477,6 +1492,7 @@ class PlayState extends MusicBeatState
 	@:dox(hide)
 	override public function onFocusLost():Void
 	{
+<<<<<<< HEAD
 		if (!paused && FlxG.autoPause)
 		{
 			for (strumLine in strumLines.members)
@@ -1484,6 +1500,8 @@ class PlayState extends MusicBeatState
 			inst.pause();
 			vocals.pause();
 		}
+=======
+>>>>>>> imgui
 		gameAndCharsCall("onFocusLost");
 		updateDiscordPresence();
 		super.onFocusLost();
@@ -1660,6 +1678,7 @@ class PlayState extends MusicBeatState
 			if (camZoomingLastBeat != beat)
 			{
 				camZoomingLastBeat = beat;
+<<<<<<< HEAD
 				if (useCamZoomMult)
 				{
 					if (camZoomingMult < maxCamZoomMult)
@@ -1670,6 +1689,10 @@ class PlayState extends MusicBeatState
 					FlxG.camera.zoom += camGameZoomMult * camZoomingStrength;
 					camHUD.zoom += camHUDZoomMult * camZoomingStrength;
 				}
+=======
+				
+				doBopZoom();
+>>>>>>> imgui
 			}
 		}
 
@@ -1756,6 +1779,7 @@ class PlayState extends MusicBeatState
 		scripts.event("postDraw", e);
 	}
 
+<<<<<<< HEAD
 	public function moveCamera()
 		if (strumLines.members[curCameraTarget] != null)
 		{
@@ -1768,6 +1792,39 @@ class PlayState extends MusicBeatState
 					camFollow.setPosition(event.position.x, event.position.y);
 			}
 			data.put();
+=======
+	public function doBopZoom()
+	{
+		var event:BopZoomEvent = EventManager.get(BopZoomEvent).recycle(useCamZoomMult, maxCamZoomMult, camZoomingStrength);
+		gameAndCharsEvent("onBopZoom", event);
+
+		if (event.cancelled)
+		{
+			gameAndCharsEvent("onPostBopZoom", event);
+			return;
+		}
+
+		if (event.useZoomMultiplier) {
+			if (camZoomingMult < event.maxZoomMultiplier)
+				camZoomingMult += event.zoomStrength;
+		}
+		else if (FlxG.camera.zoom < maxCamZoom) {
+			FlxG.camera.zoom += camGameZoomMult * event.zoomStrength;
+			camHUD.zoom += camHUDZoomMult * event.zoomStrength;
+		}
+
+		gameAndCharsEvent("onPostBopZoom", event);
+	}
+
+	public function moveCamera() if (strumLines.members[curCameraTarget] != null) {
+		var data:CamPosData = getStrumlineCamPos(curCameraTarget);
+		data.pos.add(cameraFocusOffset.x, cameraFocusOffset.y);
+
+		if (data.amount > 0) {
+			var event = gameAndCharsEvent("onCameraMove", EventManager.get(CamMoveEvent).recycle(data.pos, strumLines.members[curCameraTarget], data.amount));
+			if (!event.cancelled)
+				camFollow.setPosition(event.position.x, event.position.y);
+>>>>>>> imgui
 		}
 
 	/**
